@@ -30,6 +30,7 @@ class CommandHandlerKey(Enum):
     ECHO_KEY = "ECHO"
     SET_KEY = "SET"
     GET_KEY = "GET"
+    EXISTS_KEY = "EXISTS"
 
 
 

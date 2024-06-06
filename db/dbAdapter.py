@@ -20,6 +20,10 @@ class DbAdapter(ABC):
     @abstractmethod
     def delete(self, key):
         return
+    
+    @abstractmethod
+    def exists(self, key) -> bool:
+        return
 
 class LocalDbAdapter(DbAdapter):
     def __init__(self) -> None:
@@ -42,10 +46,13 @@ class LocalDbAdapter(DbAdapter):
         self.db.repo[key] = (value, options)
         return True
     
-    def delete(self, key):
+    def delete(self, key): # -------------- REFACTOR --------------
         if key not in self.db.repo:
             raise FunctionalException("Key doesn't exist")
         del self.db.repo[key]
+
+    def exists(self, key) -> bool:
+        return bool(self.db.repo.get(key))
     
 class TTLDbAdapter(DbAdapter):
     def __init__(self) -> None:
@@ -63,3 +70,6 @@ class TTLDbAdapter(DbAdapter):
         if key not in self.db.repo:
             raise FunctionalException("Key doesn't exist")
         del self.db.repo[key]
+
+    def exists(self, key) -> bool:
+        return bool(self.db.repo.get(key))

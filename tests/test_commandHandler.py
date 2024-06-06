@@ -2,7 +2,7 @@ import unittest
 import time
 
 from app.services import commandHandler
-from app.entities import (simpleStringMessage, bulkStringMessage)
+from app.entities import (simpleStringMessage, bulkStringMessage, integerMessage)
 from db.dbAdapter import LocalDbAdapter, TTLDbAdapter
 from app.exceptions import FunctionalException
 
@@ -77,3 +77,31 @@ class TestCommandHandler(unittest.TestCase):
         with self.assertRaises(FunctionalException) as ex:
             handler.handle()
         self.assertEqual(ex.exception.message, "Invalid command option arguments")
+
+    def test_existsHandle(self):
+        # set first
+        handler = commandHandler.SetCommandHandler(self.dbAdapter, "x", "5")
+        handler.handle()
+
+        exister = commandHandler.ExistsCommandHandler(self.dbAdapter, "x")
+        self.assertTrue(exister.handle().serialize(), integerMessage.IntegerMessage(1).serialize())
+
+    def test_notExistsHandle(self):
+        exister = commandHandler.ExistsCommandHandler(self.dbAdapter, "x")
+        self.assertEqual(exister.handle().serialize(), integerMessage.IntegerMessage(0).serialize())
+
+    def test_multipleExistsHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+        commandHandler.SetCommandHandler(self.dbAdapter, "y", "10").handle()
+        commandHandler.SetCommandHandler(self.dbAdapter, "z", "15").handle()
+
+        handler = commandHandler.ExistsCommandHandler(self.dbAdapter, "x", "y", "z").handle()
+        self.assertEqual(handler.serialize(), integerMessage.IntegerMessage(3).serialize())
+
+    def test_multipleExistsAndNotHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+
+        handler = commandHandler.ExistsCommandHandler(self.dbAdapter, "x", "y", "z").handle()
+        self.assertEqual(handler.serialize(), integerMessage.IntegerMessage(1).serialize())

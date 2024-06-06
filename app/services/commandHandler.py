@@ -1,7 +1,6 @@
 from app.interfaces.commandHandler import CommandHandler
 from app.interfaces.message import Message
-from app.entities.simpleStringMessage import SimpleStringMessage
-from app.entities.bulkStringMessage import BulkStringMessage
+from app.entities import (simpleStringMessage, bulkStringMessage, integerMessage)
 from db.dbAdapter import DbAdapter
 from app.factories.commandOptionFactory import CommandOptionFactory
 from app.exceptions import FunctionalException
@@ -17,7 +16,7 @@ class PingCommandHandler(CommandHandler):
         pass
 
     def handle(self) -> Message:
-        return SimpleStringMessage("PONG")
+        return simpleStringMessage.SimpleStringMessage("PONG")
     
 class EchoCommandHandler(CommandHandler):
     def __init__(self, dbAdapter: DbAdapter, *args) -> None:
@@ -30,7 +29,7 @@ class EchoCommandHandler(CommandHandler):
         pass
 
     def handle(self) -> Message:
-        return BulkStringMessage(" ".join(self.args))
+        return bulkStringMessage.BulkStringMessage(" ".join(self.args))
     
 class SetCommandHandler(CommandHandler):
     def __init__(self, dbAdapter: DbAdapter, *args) -> None:
@@ -53,7 +52,7 @@ class SetCommandHandler(CommandHandler):
         
     def handle(self) -> Message:
         self._execute_command()
-        return SimpleStringMessage("OK")
+        return simpleStringMessage.SimpleStringMessage("OK")
     
 class GetCommandHandler(CommandHandler):
     def __init__(self, dbAdapter: DbAdapter, *args) -> None:
@@ -71,4 +70,23 @@ class GetCommandHandler(CommandHandler):
 
     def handle(self) -> Message:
         response = self._execute_command()
-        return BulkStringMessage(response if response else "nil")
+        return bulkStringMessage.BulkStringMessage(response if response else "nil")
+    
+
+class ExistsCommandHandler(CommandHandler):
+    def __init__(self, dbAdapter: DbAdapter, *args) -> None:
+        super().__init__(dbAdapter, *args)
+
+    def _set_options(self):
+        pass
+
+    def _execute_command(self):
+        if not (isinstance(self.args, tuple) and len(self.args) > 0):
+            raise FunctionalException("Not valid command arguments length")
+
+        # return the count of existing keys
+        return sum((1 for key in self.args if self.dbAdapter.exists(key)), start=0)
+
+    def handle(self) -> Message:
+        response = self._execute_command()
+        return integerMessage.IntegerMessage(response)
