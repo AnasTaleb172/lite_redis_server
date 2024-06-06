@@ -46,10 +46,12 @@ class LocalDbAdapter(DbAdapter):
         self.db.repo[key] = (value, options)
         return True
     
-    def delete(self, key): # -------------- REFACTOR --------------
-        if key not in self.db.repo:
-            raise FunctionalException("Key doesn't exist")
-        del self.db.repo[key]
+    def delete(self, key):
+        try:
+            del self.db.repo[key]
+            return True
+        except KeyError as e:
+            return False
 
     def exists(self, key) -> bool:
         return bool(self.db.repo.get(key))
@@ -67,9 +69,11 @@ class TTLDbAdapter(DbAdapter):
         return True
 
     def delete(self, key):
-        if key not in self.db.repo:
-            raise FunctionalException("Key doesn't exist")
-        del self.db.repo[key]
+        try:
+            del self.db.repo[key]
+            return True
+        except KeyError as e:
+            return False
 
     def exists(self, key) -> bool:
         return bool(self.db.repo.get(key))

@@ -90,3 +90,21 @@ class ExistsCommandHandler(CommandHandler):
     def handle(self) -> Message:
         response = self._execute_command()
         return integerMessage.IntegerMessage(response)
+
+class DelCommandHandler(CommandHandler):
+    def __init__(self, dbAdapter: DbAdapter, *args) -> None:
+        super().__init__(dbAdapter, *args)
+
+    def _set_options(self):
+        pass
+
+    def _execute_command(self):
+        if not (isinstance(self.args, tuple) and len(self.args) > 0):
+            raise FunctionalException("Not valid command arguments length")
+
+        # return the count of existing keys
+        return sum((1 for key in self.args if self.dbAdapter.delete(key)), start=0)
+
+    def handle(self) -> Message:
+        response = self._execute_command()
+        return integerMessage.IntegerMessage(response)

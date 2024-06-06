@@ -105,3 +105,34 @@ class TestCommandHandler(unittest.TestCase):
 
         handler = commandHandler.ExistsCommandHandler(self.dbAdapter, "x", "y", "z").handle()
         self.assertEqual(handler.serialize(), integerMessage.IntegerMessage(1).serialize())
+
+    def test_delHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+
+        deleter = commandHandler.DelCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(deleter.serialize(), integerMessage.IntegerMessage(1).serialize())
+
+    def test_multipleDelHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+        commandHandler.SetCommandHandler(self.dbAdapter, "y", "5").handle()
+        commandHandler.SetCommandHandler(self.dbAdapter, "z", "5").handle()
+
+        deleter = commandHandler.DelCommandHandler(self.dbAdapter, "x", "y", "z").handle()
+        self.assertEqual(deleter.serialize(), integerMessage.IntegerMessage(3).serialize())
+
+    def test_multipleDelHandle_mix_exists_and_not(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+        commandHandler.SetCommandHandler(self.dbAdapter, "y", "5").handle()
+
+        deleter = commandHandler.DelCommandHandler(self.dbAdapter, "x", "y", "z").handle()
+        self.assertEqual(deleter.serialize(), integerMessage.IntegerMessage(2).serialize())
+
+    def test_delNotExistHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "5").handle()
+
+        deleter = commandHandler.DelCommandHandler(self.dbAdapter, "y").handle()
+        self.assertEqual(deleter.serialize(), integerMessage.IntegerMessage(0).serialize())

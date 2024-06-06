@@ -34,15 +34,13 @@ class TestLocalDBAdapter(unittest.TestCase):
 
     def test_delete(self):
         self.adapter.set("x", 5)
-        self.adapter.delete("x")
+        deleted = self.adapter.delete("x")
 
         self.assertEqual(self.adapter.get("x"), None)
+        self.assertTrue(deleted)
 
     def test_deleteNotExistingKey(self):
-        with self.assertRaises(FunctionalException) as ex:
-            self.adapter.delete("x")
-
-        self.assertEqual(ex.exception.message, "Key doesn't exist")
+        self.assertFalse(self.adapter.delete("x"))
 
 
 class TestTTLDB(unittest.TestCase):
@@ -95,7 +93,4 @@ class TestTTLDBAdapter(unittest.TestCase):
         self.assertEqual(self.adapter.get("x"), None)
 
     def test_deleteNotExistingKey(self):
-        with self.assertRaises(FunctionalException) as ex:
-            self.adapter.delete("x")
-
-        self.assertEqual(ex.exception.message, "Key doesn't exist")
+        self.assertFalse(self.adapter.delete("x"))

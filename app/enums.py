@@ -31,6 +31,7 @@ class CommandHandlerKey(Enum):
     SET_KEY = "SET"
     GET_KEY = "GET"
     EXISTS_KEY = "EXISTS"
+    DEL_KEY = "DEL"
 
 
 

@@ -22,5 +22,7 @@ class CommandHandlerFactory:
                 return commandHandler.GetCommandHandler(dbAdapter, *args)
             case CommandHandlerKey.EXISTS_KEY.value:
                 return commandHandler.ExistsCommandHandler(dbAdapter, *args)
+            case CommandHandlerKey.DEL_KEY.value:
+                return commandHandler.DelCommandHandler(dbAdapter, *args)
             case _:
                 raise NotValidCommandHandlerException
