@@ -27,6 +27,22 @@ class TestCommandHandler(unittest.TestCase):
         handler = commandHandler.GetCommandHandler(self.dbAdapter, "x")
         self.assertEqual(handler.handle().serialize(), bulkStringMessage.BulkStringMessage("5").serialize())
 
+    def test_GetHandleNegativeValue(self):
+        # set first
+        setter = commandHandler.SetCommandHandler(self.dbAdapter, "x", "-5")
+        setter.handle()
+
+        handler = commandHandler.GetCommandHandler(self.dbAdapter, "x")
+        self.assertEqual(handler.handle().serialize(), bulkStringMessage.BulkStringMessage("-5").serialize())
+
+    def test_GetHandleNegativeOne(self):
+        # set first
+        setter = commandHandler.SetCommandHandler(self.dbAdapter, "x", "-1")
+        setter.handle()
+
+        handler = commandHandler.GetCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(handler.serialize(), bulkStringMessage.BulkStringMessage("-1").serialize())
+
     def test_NotValidGetHandleCommandArguments(self):
         handler = commandHandler.GetCommandHandler(self.dbAdapter)
         with self.assertRaises(FunctionalException) as ex:

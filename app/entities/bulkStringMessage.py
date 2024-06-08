@@ -36,13 +36,12 @@ class BulkStringMessage(Message):
     def serialize(self) -> str:
         if not isinstance(self.text, str) and not self.text is None:
             raise NotValidMessageFormatException
+        
+        # handle null case
+        if self.text is not None:
+            messageText = self.text
+            serializedMessage = f"{MessagePrefix.BULK_STRING.value}{len(messageText)}{MessageSpecialChar.CRLF.value}{messageText}{MessageSpecialChar.CRLF.value}"
+        else:
+            serializedMessage = "$-1\r\n"
 
-        # generate message text
-        messageText = self.text if self.text is not None else "-1"
-        messageLength = (
-            f"{len(self.text)}{MessageSpecialChar.CRLF.value}"
-            if messageText != "-1"
-            else ""
-        )
-
-        return f"{MessagePrefix.BULK_STRING.value}{messageLength}{messageText}{MessageSpecialChar.CRLF.value}"
+        return serializedMessage

@@ -50,6 +50,10 @@ class TestBulkStringMessage(unittest.TestCase):
         msg = bulkStringMessage.BulkStringMessage(None)
         self.assertEqual(msg.serialize(), "$-1\r\n")
 
+    def test_serializeMinusOneCase(self):
+        msg = bulkStringMessage.BulkStringMessage("-1")
+        self.assertEqual(msg.serialize(), "$2\r\n-1\r\n")
+
     def test_serializeNotStringCase(self):
         msg = bulkStringMessage.BulkStringMessage(["1"])
         self.assertRaises(exceptions.NotValidMessageFormatException, msg.serialize)
