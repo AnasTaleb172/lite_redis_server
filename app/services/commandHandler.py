@@ -197,3 +197,37 @@ class LpushCommandHandler(CommandHandler):
     def handle(self) -> Message:
         response = self._execute_command()
         return integerMessage.IntegerMessage(response)
+    
+
+class RpushCommandHandler(CommandHandler):
+    def __init__(self, dbAdapter: DbAdapter, *args) -> None:
+        super().__init__(dbAdapter, *args)
+
+    def _set_options(self):
+        pass
+
+    def _execute_command(self):
+        if not (isinstance(self.args, tuple) and len(self.args) > 1):
+            raise FunctionalException("Not valid command arguments length")
+        
+        storedList = self.dbAdapter.get(self.args[0]) # get stored key
+
+        if storedList is None:
+            updatedList = []
+        elif not isinstance(storedList, list):
+            raise FunctionalException("WRONGTYPE Operation against a key holding the wrong kind of value")
+        else:
+            updatedList = storedList
+
+        # Add reversed self.args[1:] to the beginning of updatedList
+        updatedList = updatedList + list(self.args[1:])
+
+        # update the value in db
+        self.dbAdapter.set(self.args[0], updatedList)
+
+        # return the sizze of updatedlist
+        return len(updatedList)
+
+    def handle(self) -> Message:
+        response = self._execute_command()
+        return integerMessage.IntegerMessage(response)
