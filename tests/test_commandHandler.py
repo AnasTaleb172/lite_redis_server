@@ -136,3 +136,35 @@ class TestCommandHandler(unittest.TestCase):
 
         deleter = commandHandler.DelCommandHandler(self.dbAdapter, "y").handle()
         self.assertEqual(deleter.serialize(), integerMessage.IntegerMessage(0).serialize())
+
+    def test_incrHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", 3).handle()
+        incrementer = commandHandler.IncrCommandHandler(self.dbAdapter, "x").handle()
+
+        self.assertEqual(incrementer.serialize(), integerMessage.IntegerMessage(4).serialize())
+
+    def test_incrHandleNotExist(self):
+        incrementer = commandHandler.IncrCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(incrementer.serialize(), integerMessage.IntegerMessage(1).serialize())
+
+    def test_incrHandleNotExistThenStore(self):
+        commandHandler.IncrCommandHandler(self.dbAdapter, "x").handle()
+        getter = commandHandler.GetCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(getter.serialize(), bulkStringMessage.BulkStringMessage("1").serialize())
+
+    def test_incrHandleNotIntButNumeric(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "1").handle()
+        incrementer = commandHandler.IncrCommandHandler(self.dbAdapter, "x").handle()
+
+        self.assertEqual(incrementer.serialize(), integerMessage.IntegerMessage(2).serialize())
+
+    def test_incrHandleNotNumeric(self):
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "YY").handle()
+        incrementer = commandHandler.IncrCommandHandler(self.dbAdapter, "x")
+
+        with self.assertRaises(FunctionalException) as ex:
+            incrementer.handle()
+        self.assertEqual(ex.exception.message, "Stored value is not int")
+

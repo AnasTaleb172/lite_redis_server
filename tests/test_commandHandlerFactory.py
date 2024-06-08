@@ -21,6 +21,15 @@ class TestCommandHandlerFactory(unittest.TestCase):
     def test_isGetCommand(self):
         self.assertIsInstance(CommandHandlerFactory.create_command_handler_by_text(LocalDbAdapter(), ["get"]), commandHandler.GetCommandHandler)
 
+    def test_isDelCommand(self):
+        self.assertIsInstance(CommandHandlerFactory.create_command_handler_by_text(LocalDbAdapter(), ["del"]), commandHandler.DelCommandHandler)
+
+    def test_isExistCommand(self):
+        self.assertIsInstance(CommandHandlerFactory.create_command_handler_by_text(LocalDbAdapter(), ["exists"]), commandHandler.ExistsCommandHandler)
+
+    def test_isIncrCommand(self):
+        self.assertIsInstance(CommandHandlerFactory.create_command_handler_by_text(LocalDbAdapter(), ["incr"]), commandHandler.IncrCommandHandler)
+
     def test_notValidCommandString(self):
         with self.assertRaises(FunctionalException) as ex:
             CommandHandlerFactory.create_command_handler_by_text(LocalDbAdapter(), ["test"])

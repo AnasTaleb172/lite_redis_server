@@ -29,7 +29,7 @@ class LocalDbAdapter(DbAdapter):
     def __init__(self) -> None:
         super().__init__(LocalDatabase())
 
-    def get(self, key):
+    def get(self, key) -> str | None:
         value, options = self.db.repo.get(key) or (None, [])
 
         # apply conditional command options
