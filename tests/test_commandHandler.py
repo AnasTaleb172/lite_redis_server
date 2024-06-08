@@ -215,4 +215,27 @@ class TestCommandHandler(unittest.TestCase):
             decrementer.handle()
         self.assertEqual(ex.exception.message, "Stored value is not int")
 
+    def test_lpushHandle(self):
+        commandHandler.LpushCommandHandler(self.dbAdapter, "x", 1, 2, 3).handle()
+        self.assertEqual(self.dbAdapter.get("x"), [3,2,1])
+
+    def test_lpushHandleAlreadyExists(self):
+        commandHandler.LpushCommandHandler(self.dbAdapter, "x", 1, 2, 3).handle()
+        commandHandler.LpushCommandHandler(self.dbAdapter, "x", 4,5,6).handle()
+        self.assertEqual(self.dbAdapter.get("x"), [6,5,4,3,2,1])
+
+    def test_lpushHandleAlreadyExists(self):
+        commandHandler.LpushCommandHandler(self.dbAdapter, "x", 1, 2, 3).handle()
+        commandHandler.LpushCommandHandler(self.dbAdapter, "x", 4, 5, 6).handle()
+        self.assertEqual(self.dbAdapter.get("x"), [6,5,4,3,2,1])
+
+    def test_lpushHandleAlreadyExistsButNotList(self):
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", 1).handle()
+        handler = commandHandler.LpushCommandHandler(self.dbAdapter, "x", 4, 5, 6)
+
+        with self.assertRaises(FunctionalException) as ex:
+            handler.handle()
+        self.assertEqual(ex.exception.message, "WRONGTYPE Operation against a key holding the wrong kind of value")
+
+
 

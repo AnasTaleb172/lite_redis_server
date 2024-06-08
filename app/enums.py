@@ -34,6 +34,7 @@ class CommandHandlerKey(Enum):
     DEL_KEY = "DEL"
     INCR_KEY = "INCR"
     DECR_KEY = "DECR"
+    LPUSH_KEY = "LPUSH"
 
 
 

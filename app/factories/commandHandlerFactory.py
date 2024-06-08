@@ -28,5 +28,7 @@ class CommandHandlerFactory:
                 return commandHandler.IncrCommandHandler(dbAdapter, *args)
             case CommandHandlerKey.DECR_KEY.value:
                 return commandHandler.DecrCommandHandler(dbAdapter, *args)
+            case CommandHandlerKey.LPUSH_KEY.value:
+                return commandHandler.LpushCommandHandler(dbAdapter, *args)
             case _:
                 raise NotValidCommandHandlerException
