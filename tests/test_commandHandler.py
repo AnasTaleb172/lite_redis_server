@@ -168,3 +168,35 @@ class TestCommandHandler(unittest.TestCase):
             incrementer.handle()
         self.assertEqual(ex.exception.message, "Stored value is not int")
 
+    def test_decrHandle(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", 3).handle()
+        decrementer = commandHandler.DecrCommandHandler(self.dbAdapter, "x").handle()
+
+        self.assertEqual(decrementer.serialize(), integerMessage.IntegerMessage(2).serialize())
+
+    def test_decrHandleNotExist(self):
+        decrementer = commandHandler.DecrCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(decrementer.serialize(), integerMessage.IntegerMessage(-1).serialize())
+
+    def test_decrHandleNotExistThenStore(self):
+        commandHandler.DecrCommandHandler(self.dbAdapter, "x").handle()
+        getter = commandHandler.GetCommandHandler(self.dbAdapter, "x").handle()
+        self.assertEqual(getter.serialize(), bulkStringMessage.BulkStringMessage("-1").serialize())
+
+    def test_decrHandleNotIntButNumeric(self):
+        # set first
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "2").handle()
+        decrementer = commandHandler.DecrCommandHandler(self.dbAdapter, "x").handle()
+
+        self.assertEqual(decrementer.serialize(), integerMessage.IntegerMessage(1).serialize())
+
+    def test_decrHandleNotNumeric(self):
+        commandHandler.SetCommandHandler(self.dbAdapter, "x", "YY").handle()
+        decrementer = commandHandler.DecrCommandHandler(self.dbAdapter, "x")
+
+        with self.assertRaises(FunctionalException) as ex:
+            decrementer.handle()
+        self.assertEqual(ex.exception.message, "Stored value is not int")
+
+

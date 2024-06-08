@@ -5,7 +5,7 @@ from handlers.requestHandler import RequestHandler
 from db.dbAdapter import DbAdapter, LocalDbAdapter, TTLDbAdapter
 
 class RedisServer:
-    def __init__(self, dbAdapter: DbAdapter, host='127.0.0.1', port=6379):
+    def __init__(self, dbAdapter: DbAdapter, host='127.0.0.1', port=6380):
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -68,5 +68,5 @@ class RedisServer:
                 data = data[sent:]
 
 if __name__ == "__main__":
-    server = RedisServer(dbAdapter=TTLDbAdapter())
+    server = RedisServer(dbAdapter=LocalDbAdapter())
     server.start()

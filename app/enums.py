@@ -33,6 +33,7 @@ class CommandHandlerKey(Enum):
     EXISTS_KEY = "EXISTS"
     DEL_KEY = "DEL"
     INCR_KEY = "INCR"
+    DECR_KEY = "DECR"
 
 
 
