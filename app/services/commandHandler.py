@@ -122,13 +122,9 @@ class IncrCommandHandler(CommandHandler):
         
         storedValue = self.dbAdapter.get(self.args[0]) # get stored key
 
-        if isinstance(storedValue, int): # pass if storedValue is int
-            pass
-        elif storedValue is None: # set to 0 if storedValue is None
-            storedValue = 0
-        elif isinstance(storedValue, str) and storedValue.isnumeric(): # parse to int if storedValue is numeric
-            storedValue = int(storedValue)
-        else:
+        try:
+            storedValue = int(storedValue) if storedValue is not None else 0
+        except ValueError as err:
             raise FunctionalException("Stored value is not int")
 
         updatedValue = storedValue + 1
@@ -154,13 +150,9 @@ class DecrCommandHandler(CommandHandler):
         
         storedValue = self.dbAdapter.get(self.args[0]) # get stored key
 
-        if isinstance(storedValue, int): # pass if storedValue is int
-            pass
-        elif storedValue is None: # set to 0 if storedValue is None
-            storedValue = 0
-        elif isinstance(storedValue, str) and storedValue.isnumeric(): # parse to int if storedValue is numeric
-            storedValue = int(storedValue)
-        else:
+        try:
+            storedValue = int(storedValue) if storedValue is not None else 0
+        except ValueError as err:
             raise FunctionalException("Stored value is not int")
 
         updatedValue = storedValue - 1
