@@ -12,6 +12,7 @@ class RedisServer:
         self.selector = selectors.DefaultSelector()
         self.dbAdapter = dbAdapter
         self.requestHandler = RequestHandler(self.dbAdapter)
+        self.connectionsCount = 0
 
     def start(self):
         self.sock.bind((self.host, self.port))
@@ -27,10 +28,12 @@ class RedisServer:
                 for key, mask in events:
                     if key.data is None:
                         self.accept_connection(key.fileobj)
+                        self.connectionsCount += 1
                     else:
                         self.serve_connection(key, mask)
         except KeyboardInterrupt:
             print("Caught keyboard interrupt, exiting")
+            print(f"Total # of connections: {self.connectionsCount}")
         finally:
             self.sock.close()
     
@@ -39,7 +42,7 @@ class RedisServer:
         
     def accept_connection(self, sock: socket.socket):
         conn, addr = sock.accept()
-        print(f"Accepted connection from {addr}")
+        # print(f"Accepted connection from {addr}")
         conn.setblocking(False)
         self.selector.register(conn, selectors.EVENT_READ | selectors.EVENT_WRITE, data=b'')
 
@@ -51,19 +54,19 @@ class RedisServer:
         if mask & selectors.EVENT_READ:
             recv_data = sock.recv(1024)
             if recv_data and recv_data != b'*2\r\n$7\r\nCOMMAND\r\n$4\r\nDOCS\r\n':
-                print(f"Received data: {recv_data}")
+                # print(f"Received data: {recv_data}")
                 data += recv_data
             else:
-                print(f"Closing connection to ....")
+                # print(f"Closing connection to ....")
                 self.selector.unregister(sock)
                 sock.close()
 
         # Socket is ready to write -> Read from socket & send to buffer
         if mask & selectors.EVENT_WRITE:
             if data:
-                print(f"Responding To a client ....")
+                # print(f"Responding To a client ....")
                 handledData = self._handle_data(data)
-                print(f"Handled data: {handledData}")
+                # print(f"Handled data: {handledData}")
                 sent = sock.send(handledData)
                 data = data[sent:]
 

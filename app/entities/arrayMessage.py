@@ -3,7 +3,7 @@ import re
 from ..interfaces.message import Message
 from ..enums import MessageSpecialChar, MessagePrefix
 from ..exceptions import NotValidMessageFormatException
-
+from .. import helpers
 
 class ArrayMessage(Message):
     """
@@ -21,19 +21,22 @@ class ArrayMessage(Message):
         from ..factories.messageFactory import MessageFactory
 
         # array regex pattern
-        pattern = "\\*[+-]?\d+\\r\\n|\+.+\\r\\n|\$\d+\\r\\n.+\\r\\n|\$-1\\r\\n|-.+\\r\\n|:[+-]?\d+\\r\\n"
-        splittedMessage = re.findall(pattern, self.text)
+        # pattern = "\\*[+-]?\d+\\r\\n|\+.+\\r\\n|\$\d+\\r\\n.+\\r\\n|\$-1\\r\\n|-.+\\r\\n|:[+-]?\d+\\r\\n"
+        # splittedMessage = re.findall(pattern, self.text)
+        splittedMessage = helpers.ARRAY_MESSAGE_COMPILED_PATTERN.findall(self.text)
 
         # array definition
         arrayDef = splittedMessage.pop(0)  # '*23\\r\\' -> '\*([+-]?\d+)\\r\\n'
-        arrayDefGroups = re.search(r"\*([+-]?\d+)\r\n", arrayDef)
+        # arrayDefGroups = re.search(r"\*([+-]?\d+)\r\n", arrayDef)
+        arrayDefGroups = helpers.ARRAY_DEF_GROUPS_COMPILED_PATTERN.search(arrayDef)
+
         if arrayDefGroups:
-            arrayLength = int(arrayDefGroups.group(1))
+            arrayLength = arrayDefGroups.group(1)
 
             match arrayLength:
-                case -1:
+                case "-1":
                     message = None
-                case 0:
+                case "0":
                     message = []
                 case _:  # has elements
                     message = []
@@ -43,7 +46,7 @@ class ArrayMessage(Message):
                         # if not within array elements range
                         if i >= offset:
                             # if nested array
-                            nestedArrayDef = re.search(r"\*([+-]?\d+)\r\n", splitMsg)
+                            nestedArrayDef = helpers.ARRAY_DEF_GROUPS_COMPILED_PATTERN.search(splitMsg)
                             if nestedArrayDef:
                                 nestedArrayLength = int(nestedArrayDef.group(1))
                                 newElement = "".join(
