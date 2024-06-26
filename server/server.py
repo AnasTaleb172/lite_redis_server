@@ -6,7 +6,7 @@ This module is the entry point of the application.
 import socket
 import selectors
 
-from handlers.requestHandler import RequestHandler
+from server.handlers.requestHandler import RequestHandler
 from db.dbAdapter import DbAdapter, LocalDbAdapter
 
 class RedisServer:
