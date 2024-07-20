@@ -1,8 +1,8 @@
 import socket
 import threading
 
-from handlers.requestHandler import RequestHandler
-from db.dbAdapter import DbAdapter, LocalDbAdapter, TTLDbAdapter
+from server.handlers.requestHandler import RequestHandler
+from db.dbAdapter import DbAdapter, LocalDbAdapter
 
 class RedisServer:
     def __init__(self, dbAdapter: DbAdapter=LocalDbAdapter, host='127.0.0.1', port=6381):
